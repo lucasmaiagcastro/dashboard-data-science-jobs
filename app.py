@@ -1,245 +1,86 @@
 import dash
-from dash import dcc, html, Input, Output
 import dash_bootstrap_components as dbc
-
-import src.preprocessing as prep
-import src.charts as charts
+from dash import html
 
 app = dash.Dash(
     __name__,
+    use_pages=True,
+    suppress_callback_exceptions=True,
     external_stylesheets=[dbc.themes.DARKLY, dbc.icons.BOOTSTRAP],
-    title="Data Science Jobs 2025",
+    title="DS Jobs 2025",
 )
 server = app.server
 
-df, skills_df = prep.load_data()
-
-SENIORITY_OPTIONS = [
-    {"label": "Junior", "value": "junior"},
-    {"label": "Mid-level", "value": "midlevel"},
-    {"label": "Senior", "value": "senior"},
-    {"label": "Lead", "value": "lead"},
-    {"label": "N/A", "value": "Não informado"},
-]
-
-STATUS_OPTIONS = [
-    {"label": "Presencial", "value": "on-site"},
-    {"label": "Híbrido", "value": "hybrid"},
-    {"label": "Remoto", "value": "remote"},
-    {"label": "N/A", "value": "Não informado"},
-]
-
-INDUSTRY_OPTIONS = [
-    {"label": i, "value": i}
-    for i in sorted(df["industry"].unique())
-    if i != "Não informado"
-]
-
-DROPDOWN_STYLE = {
-    "borderRadius": "8px",
-    "fontSize": "13px",
-}
-
-
-def kpi_card(icon, label, value_id, color):
-    return dbc.Card(
-        dbc.CardBody(
-            html.Div(
+navbar = dbc.Navbar(
+    dbc.Container(
+        [
+            dbc.NavbarBrand(
                 [
-                    html.Div(
-                        html.I(className=f"bi {icon}", style={"fontSize": "1.8rem", "color": color}),
-                        className="d-flex align-items-center justify-content-center rounded-3 p-2",
-                        style={"background": f"{color}22", "width": "52px", "height": "52px"},
-                    ),
-                    html.Div(
-                        [
-                            html.P(label, className="text-muted mb-0", style={"fontSize": "12px"}),
-                            html.H5(id=value_id, className="fw-bold mb-0", style={"color": color}),
-                        ],
-                        className="ms-3",
-                    ),
+                    html.Span("DS", className="brand-ds"),
+                    html.Span(" Jobs", style={"fontWeight": "300"}),
+                    html.Span(" 2025", style={"fontWeight": "300", "color": "#64748b", "fontSize": "0.9rem"}),
                 ],
-                className="d-flex align-items-center",
-            )
-        ),
-        className="border-0 shadow-sm h-100",
-        style={"background": "#1e293b", "borderRadius": "12px"},
-    )
-
-
-def chart_card(graph_id):
-    return dbc.Card(
-        dbc.CardBody(
-            dcc.Graph(id=graph_id, config={"displayModeBar": False}, style={"borderRadius": "8px"})
-        ),
-        className="border-0 shadow-sm h-100",
-        style={"background": "#1e293b", "borderRadius": "12px"},
-    )
-
-
-app.layout = dbc.Container(
-    [
-        # ── Header ──────────────────────────────────────────────────────────
-        dbc.Row(
-            dbc.Col(
-                html.Div(
+                href="/",
+                className="me-4",
+                style={"fontSize": "1.35rem", "letterSpacing": "-0.5px"},
+            ),
+            dbc.NavbarToggler(id="navbar-toggler"),
+            dbc.Collapse(
+                dbc.Nav(
                     [
-                        html.Div(
-                            [
-                                html.Span("DS", style={
-                                    "background": "linear-gradient(135deg,#6366f1,#06b6d4)",
-                                    "WebkitBackgroundClip": "text",
-                                    "WebkitTextFillColor": "transparent",
-                                    "fontWeight": "800",
-                                    "fontSize": "2rem",
-                                }),
-                                html.Span(" Jobs", style={"fontWeight": "300", "fontSize": "2rem"}),
-                            ]
-                        ),
-                        html.P(
-                            "Análise do mercado de Ciência de Dados · 944 vagas · 2025",
-                            className="text-muted mb-0",
-                            style={"fontSize": "13px"},
-                        ),
+                        dbc.NavItem(dbc.NavLink(
+                            [html.I(className="bi bi-grid-fill me-1"), "Visão Geral"],
+                            href="/", active="exact",
+                        )),
+                        dbc.NavItem(dbc.NavLink(
+                            [html.I(className="bi bi-lightning-fill me-1"), "Skills"],
+                            href="/skills", active="exact",
+                        )),
+                        dbc.NavItem(dbc.NavLink(
+                            [html.I(className="bi bi-currency-dollar me-1"), "Salários"],
+                            href="/salarios", active="exact",
+                        )),
+                        dbc.NavItem(dbc.NavLink(
+                            [html.I(className="bi bi-buildings-fill me-1"), "Mercado"],
+                            href="/mercado", active="exact",
+                        )),
                     ],
-                    className="py-4",
-                )
-            )
-        ),
-
-        # ── Filters ─────────────────────────────────────────────────────────
-        dbc.Row(
-            [
-                dbc.Col(
-                    [
-                        dbc.Label("Senioridade", className="text-muted", style={"fontSize": "12px"}),
-                        dcc.Dropdown(
-                            id="filter-seniority",
-                            options=SENIORITY_OPTIONS,
-                            multi=True,
-                            placeholder="Todos os níveis...",
-                            style=DROPDOWN_STYLE,
-                        ),
-                    ],
-                    md=4,
+                    className="ms-auto",
+                    navbar=True,
                 ),
-                dbc.Col(
-                    [
-                        dbc.Label("Modalidade", className="text-muted", style={"fontSize": "12px"}),
-                        dcc.Dropdown(
-                            id="filter-status",
-                            options=STATUS_OPTIONS,
-                            multi=True,
-                            placeholder="Todas as modalidades...",
-                            style=DROPDOWN_STYLE,
-                        ),
-                    ],
-                    md=4,
-                ),
-                dbc.Col(
-                    [
-                        dbc.Label("Indústria", className="text-muted", style={"fontSize": "12px"}),
-                        dcc.Dropdown(
-                            id="filter-industry",
-                            options=INDUSTRY_OPTIONS,
-                            multi=True,
-                            placeholder="Todas as indústrias...",
-                            style=DROPDOWN_STYLE,
-                        ),
-                    ],
-                    md=4,
-                ),
-            ],
-            className="mb-4 g-3",
-        ),
-
-        # ── KPI Cards ───────────────────────────────────────────────────────
-        dbc.Row(
-            [
-                dbc.Col(kpi_card("bi-briefcase-fill", "Total de Vagas", "kpi-total", "#6366f1"), md=3),
-                dbc.Col(kpi_card("bi-currency-dollar", "Salário Médio", "kpi-salary", "#06b6d4"), md=3),
-                dbc.Col(kpi_card("bi-laptop-fill", "Trabalho Remoto", "kpi-remote", "#10b981"), md=3),
-                dbc.Col(kpi_card("bi-star-fill", "Skill Mais Pedida", "kpi-skill", "#f59e0b"), md=3),
-            ],
-            className="mb-4 g-3",
-        ),
-
-        # ── Row 1: Skills + Modality ─────────────────────────────────────────
-        dbc.Row(
-            [
-                dbc.Col(chart_card("chart-skills"), md=8),
-                dbc.Col(chart_card("chart-modality"), md=4),
-            ],
-            className="mb-4 g-3",
-        ),
-
-        # ── Row 2: Salary Industry + Salary Seniority ────────────────────────
-        dbc.Row(
-            [
-                dbc.Col(chart_card("chart-salary-industry"), md=6),
-                dbc.Col(chart_card("chart-salary-seniority"), md=6),
-            ],
-            className="mb-4 g-3",
-        ),
-
-        # ── Row 3: Salary by Skill ───────────────────────────────────────────
-        dbc.Row(
-            dbc.Col(chart_card("chart-salary-skill")),
-            className="mb-4",
-        ),
-
-        # ── Footer ───────────────────────────────────────────────────────────
-        dbc.Row(
-            dbc.Col(
-                html.P(
-                    "Dashboard de Vagas em Ciência de Dados · Visualização de Dados · Unichristus 2026",
-                    className="text-muted text-center py-3 mb-0",
-                    style={"fontSize": "12px", "borderTop": "1px solid #1e293b"},
-                )
-            )
-        ),
-    ],
-    fluid=True,
-    style={"backgroundColor": "#0f172a", "minHeight": "100vh", "padding": "0 2rem"},
+                id="navbar-collapse",
+                navbar=True,
+            ),
+        ],
+        fluid=True,
+    ),
+    color="#1e293b",
+    dark=True,
+    sticky="top",
+    style={"borderBottom": "1px solid #334155"},
 )
 
-
-@app.callback(
+app.layout = html.Div(
     [
-        Output("kpi-total", "children"),
-        Output("kpi-salary", "children"),
-        Output("kpi-remote", "children"),
-        Output("kpi-skill", "children"),
-        Output("chart-skills", "figure"),
-        Output("chart-modality", "figure"),
-        Output("chart-salary-industry", "figure"),
-        Output("chart-salary-seniority", "figure"),
-        Output("chart-salary-skill", "figure"),
+        navbar,
+        dbc.Container(
+            dash.page_container,
+            fluid=True,
+            style={"minHeight": "calc(100vh - 60px)", "padding": "2rem 2.5rem 1rem"},
+        ),
+        html.Footer(
+            "Dashboard de Vagas em Ciência de Dados · Visualização de Dados · Unichristus 2026",
+            style={
+                "textAlign": "center",
+                "color": "#475569",
+                "fontSize": "12px",
+                "padding": "1rem",
+                "borderTop": "1px solid #1e293b",
+            },
+        ),
     ],
-    [
-        Input("filter-seniority", "value"),
-        Input("filter-status", "value"),
-        Input("filter-industry", "value"),
-    ],
+    style={"backgroundColor": "#0f172a"},
 )
-def update_dashboard(seniority, status, industry):
-    dff, dff_skills = prep.apply_filters(df, skills_df, seniority, status, industry)
-    kpis = prep.get_kpis(dff, dff_skills)
-
-    salary_str = f"${kpis['salary_avg']:,.0f}" if kpis["salary_avg"] else "N/A"
-
-    return (
-        f"{kpis['total']:,}",
-        salary_str,
-        f"{kpis['remote_pct']:.1f}%",
-        kpis["top_skill"].title(),
-        charts.make_top_skills_chart(dff_skills),
-        charts.make_jobs_by_modality_chart(dff),
-        charts.make_salary_by_industry_chart(dff),
-        charts.make_salary_by_seniority_chart(dff),
-        charts.make_salary_by_skill_chart(dff_skills),
-    )
-
 
 if __name__ == "__main__":
     app.run(debug=True)
