@@ -10,11 +10,11 @@ dash.register_page(__name__, path="/mercado", name="Mercado")
 
 SENIORITY_OPTIONS = [
     {"label": "Junior", "value": "junior"},
-    {"label": "Mid-level", "value": "midlevel"},
+    {"label": "Pleno", "value": "midlevel"},
     {"label": "Senior", "value": "senior"},
     {"label": "Lead", "value": "lead"},
 ]
-INDUSTRY_OPTIONS = [{"label": i, "value": i} for i in sorted(df["industry"].unique()) if i != "Não informado"]
+INDUSTRY_OPTIONS = prep.get_industry_options(df)
 
 CARD_STYLE = {"background": "#1e293b", "borderRadius": "12px"}
 

@@ -5,7 +5,7 @@ SKILLS_PATH = "data/data_science_jobs_skills_clean.csv"
 
 SENIORITY_LABELS = {
     "junior": "Junior",
-    "midlevel": "Mid-level",
+    "midlevel": "Pleno",
     "senior": "Senior",
     "lead": "Lead",
     "Não informado": "Não Informado",
@@ -17,6 +17,23 @@ STATUS_LABELS = {
     "remote": "Remoto",
     "Não informado": "Não Informado",
 }
+
+INDUSTRY_LABELS = {
+    "Technology": "Tecnologia",
+    "Finance": "Finanças",
+    "Retail": "Varejo",
+    "Healthcare": "Saúde",
+    "Education": "Educação",
+    "Energy": "Energia",
+    "Manufacturing": "Manufatura",
+    "Logistics": "Logística",
+    "Não informado": "Não Informado",
+}
+
+
+def get_industry_options(df):
+    industries = sorted(i for i in df["industry"].unique() if i != "Não informado")
+    return [{"label": INDUSTRY_LABELS.get(i, i), "value": i} for i in industries]
 
 
 def load_data():
@@ -82,6 +99,7 @@ def get_jobs_by_seniority(df):
 def get_jobs_by_industry(df):
     counts = df["industry"].value_counts().reset_index()
     counts.columns = ["industry", "count"]
+    counts["label"] = counts["industry"].map(INDUSTRY_LABELS).fillna(counts["industry"])
     return counts.sort_values("count")
 
 
@@ -117,6 +135,7 @@ def get_skills_by_industry(skills_df, n_skills=8):
     top_skills = skills_df["skill"].value_counts().head(n_skills).index
     dff = skills_df[skills_df["skill"].isin(top_skills) & skills_df["industry"].isin(valid)]
     pivot = dff.groupby(["skill", "industry"]).size().unstack(fill_value=0)
+    pivot.columns = [INDUSTRY_LABELS.get(c, c) for c in pivot.columns]
     return pivot
 
 

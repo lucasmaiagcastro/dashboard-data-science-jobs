@@ -10,14 +10,25 @@ FONT_FAMILY = "Inter, system-ui, sans-serif"
 HEATMAP_SCALE = [[0, "#0f172a"], [0.4, "#4338ca"], [1, "#06b6d4"]]
 
 
-def _base(height=400):
+def _base(height=400, margin=None):
+    default_margin = dict(l=48, r=48, t=52, b=48)
+    if margin:
+        default_margin.update(margin)
     return dict(
         paper_bgcolor=TRANSPARENT,
         plot_bgcolor=TRANSPARENT,
         font=dict(color=FONT_COLOR, family=FONT_FAMILY, size=13),
-        margin=dict(l=10, r=20, t=48, b=10),
+        margin=default_margin,
         height=height,
     )
+
+
+def _yaxis_labels():
+    return dict(showgrid=False, automargin=True, ticklabelstandoff=14)
+
+
+def _xaxis_labels(**kwargs):
+    return dict(showgrid=False, automargin=True, ticklabelstandoff=10, **kwargs)
 
 
 def _empty(title, height=400):
@@ -51,10 +62,10 @@ def make_seniority_distribution_chart(df):
         hovertemplate="<b>%{y}</b>: %{x} vagas<extra></extra>",
     ))
     fig.update_layout(
-        **_base(360),
+        **_base(360, margin=dict(l=100, r=56)),
         title=dict(text="Vagas por Senioridade", font=dict(size=15, color=FONT_COLOR)),
         xaxis=dict(showgrid=False, showticklabels=False, zeroline=False),
-        yaxis=dict(showgrid=False),
+        yaxis=_yaxis_labels(),
     )
     return fig
 
@@ -66,7 +77,7 @@ def make_industry_distribution_chart(df):
 
     fig = go.Figure(go.Bar(
         x=counts["count"],
-        y=counts["industry"],
+        y=counts["label"],
         orientation="h",
         marker=dict(
             color=counts["count"],
@@ -79,10 +90,10 @@ def make_industry_distribution_chart(df):
         hovertemplate="<b>%{y}</b>: %{x} vagas<extra></extra>",
     ))
     fig.update_layout(
-        **_base(360),
+        **_base(360, margin=dict(l=120, r=56)),
         title=dict(text="Vagas por Indústria", font=dict(size=15, color=FONT_COLOR)),
         xaxis=dict(showgrid=False, showticklabels=False, zeroline=False),
-        yaxis=dict(showgrid=False),
+        yaxis=_yaxis_labels(),
     )
     return fig
 
@@ -131,10 +142,10 @@ def make_top_skills_chart(skills_df, n=15):
         hovertemplate="<b>%{y}</b><br>Vagas: %{x}<extra></extra>",
     ))
     fig.update_layout(
-        **_base(460),
+        **_base(460, margin=dict(l=130, r=56)),
         title=dict(text="Skills Mais Demandadas", font=dict(size=15, color=FONT_COLOR)),
         xaxis=dict(showgrid=False, showticklabels=False, zeroline=False),
-        yaxis=dict(showgrid=False, tickfont=dict(size=12)),
+        yaxis={**_yaxis_labels(), "tickfont": dict(size=12)},
     )
     return fig
 
@@ -156,10 +167,10 @@ def make_skills_heatmap_by_seniority(skills_df):
         colorbar=dict(ticksuffix="%", tickfont=dict(color=FONT_COLOR), outlinewidth=0),
     ))
     fig.update_layout(
-        **_base(460),
+        **_base(460, margin=dict(l=130, r=72, b=56)),
         title=dict(text="Skills por Senioridade (% das menções)", font=dict(size=15, color=FONT_COLOR)),
-        xaxis=dict(showgrid=False),
-        yaxis=dict(showgrid=False),
+        xaxis=_xaxis_labels(),
+        yaxis={**_yaxis_labels(), "tickfont": dict(size=12)},
     )
     return fig
 
@@ -181,10 +192,10 @@ def make_skills_heatmap_by_industry(skills_df):
         colorbar=dict(ticksuffix="%", tickfont=dict(color=FONT_COLOR), outlinewidth=0),
     ))
     fig.update_layout(
-        **_base(440),
+        **_base(440, margin=dict(l=130, r=72, b=72)),
         title=dict(text="Skills por Indústria (% das menções)", font=dict(size=15, color=FONT_COLOR)),
-        xaxis=dict(showgrid=False),
-        yaxis=dict(showgrid=False),
+        xaxis=_xaxis_labels(tickangle=-25),
+        yaxis={**_yaxis_labels(), "tickfont": dict(size=12)},
     )
     return fig
 
@@ -231,10 +242,10 @@ def make_salary_boxplot_by_seniority(df):
         return _empty("Distribuição Salarial por Senioridade", 420)
 
     fig.update_layout(
-        **_base(420),
+        **_base(420, margin=dict(b=56)),
         title=dict(text="Distribuição Salarial por Senioridade (US$k)", font=dict(size=15, color=FONT_COLOR)),
         yaxis=dict(showgrid=True, gridcolor=GRID_COLOR, tickprefix="$", ticksuffix="k", zeroline=False),
-        xaxis=dict(showgrid=False),
+        xaxis=_xaxis_labels(),
         showlegend=False,
     )
     return fig
@@ -247,20 +258,21 @@ def make_salary_by_industry_chart(df):
 
     fig = go.Figure()
     for i, industry in enumerate(order):
+        label = prep.INDUSTRY_LABELS.get(industry, industry)
         subset = dff[dff["industry"] == industry]["salary_avg_adjusted"] / 1000
         fig.add_trace(go.Box(
             y=subset,
-            name=industry,
+            name=label,
             marker_color=PALETTE[i % len(PALETTE)],
             line=dict(width=1.5),
             boxmean="sd",
-            hovertemplate=f"<b>{industry}</b><br>Mediana: $%{{median:.0f}}k<extra></extra>",
+            hovertemplate=f"<b>{label}</b><br>Mediana: $%{{median:.0f}}k<extra></extra>",
         ))
     fig.update_layout(
-        **_base(420),
+        **_base(420, margin=dict(b=72)),
         title=dict(text="Distribuição Salarial por Indústria (US$k)", font=dict(size=15, color=FONT_COLOR)),
         yaxis=dict(showgrid=True, gridcolor=GRID_COLOR, tickprefix="$", ticksuffix="k", zeroline=False),
-        xaxis=dict(showgrid=False),
+        xaxis=_xaxis_labels(tickangle=-25),
         showlegend=False,
     )
     return fig
@@ -281,10 +293,10 @@ def make_salary_by_seniority_chart(df):
         hovertemplate="<b>%{x}</b><br>Mediana: $%{y:.0f}k<extra></extra>",
     ))
     fig.update_layout(
-        **_base(400),
+        **_base(400, margin=dict(b=56)),
         title=dict(text="Salário Mediano por Senioridade (US$k)", font=dict(size=15, color=FONT_COLOR)),
         yaxis=dict(showgrid=True, gridcolor=GRID_COLOR, tickprefix="$", ticksuffix="k", zeroline=False),
-        xaxis=dict(showgrid=False),
+        xaxis=_xaxis_labels(),
     )
     return fig
 
@@ -308,10 +320,10 @@ def make_salary_by_skill_chart(skills_df, n=12):
         hovertemplate="<b>%{x}</b><br>Mediana: $%{y:.0f}k<extra></extra>",
     ))
     fig.update_layout(
-        **_base(400),
+        **_base(400, margin=dict(b=88)),
         title=dict(text="Salário Mediano por Skill — Top 12 (US$k)", font=dict(size=15, color=FONT_COLOR)),
         yaxis=dict(showgrid=True, gridcolor=GRID_COLOR, tickprefix="$", ticksuffix="k", zeroline=False),
-        xaxis=dict(showgrid=False, tickangle=-30),
+        xaxis=_xaxis_labels(tickangle=-30),
     )
     return fig
 
@@ -334,10 +346,10 @@ def make_top_companies_chart(df):
         hovertemplate="<b>%{y}</b>: %{x} vagas<extra></extra>",
     ))
     fig.update_layout(
-        **_base(460),
+        **_base(460, margin=dict(l=110, r=56)),
         title=dict(text="Top Empresas Contratantes", font=dict(size=15, color=FONT_COLOR)),
         xaxis=dict(showgrid=False, showticklabels=False, zeroline=False),
-        yaxis=dict(showgrid=False),
+        yaxis=_yaxis_labels(),
     )
     return fig
 
@@ -362,10 +374,10 @@ def make_top_locations_chart(df):
         hovertemplate="<b>%{y}</b>: %{x} empresas<extra></extra>",
     ))
     fig.update_layout(
-        **_base(460),
+        **_base(460, margin=dict(l=80, r=56)),
         title=dict(text="Top Localizações de HQ", font=dict(size=15, color=FONT_COLOR)),
         xaxis=dict(showgrid=False, showticklabels=False, zeroline=False),
-        yaxis=dict(showgrid=False),
+        yaxis=_yaxis_labels(),
     )
     return fig
 
@@ -385,9 +397,9 @@ def make_company_size_chart(df):
         hovertemplate="<b>%{x}</b>: %{y} vagas<extra></extra>",
     ))
     fig.update_layout(
-        **_base(380),
+        **_base(380, margin=dict(b=72)),
         title=dict(text="Vagas por Tamanho de Empresa", font=dict(size=15, color=FONT_COLOR)),
-        xaxis=dict(showgrid=False),
+        xaxis=_xaxis_labels(tickangle=-20),
         yaxis=dict(showgrid=True, gridcolor=GRID_COLOR, zeroline=False),
     )
     return fig
