@@ -30,6 +30,12 @@ INDUSTRY_LABELS = {
     "Não informado": "Não Informado",
 }
 
+OWNERSHIP_LABELS = {
+    "Public": "Capital Aberto",
+    "Private": "Capital Fechado",
+    "Não informado": "Não Informado",
+}
+
 
 def get_industry_options(df):
     industries = sorted(i for i in df["industry"].unique() if i != "Não informado")
@@ -186,6 +192,7 @@ def get_ownership_distribution(df):
     valid = df[df["ownership"] != "Não informado"]
     counts = valid["ownership"].value_counts().reset_index()
     counts.columns = ["ownership", "count"]
+    counts["label"] = counts["ownership"].map(OWNERSHIP_LABELS).fillna(counts["ownership"])
     return counts
 
 

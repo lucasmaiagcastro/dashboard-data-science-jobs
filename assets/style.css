@@ -52,41 +52,71 @@ body { background-color: #0f172a !important; }
   overflow: visible !important;
 }
 
-/* ── Dropdown (react-select v1) ─────────────────────────────────────── */
-.Select-control {
+/* ── Dropdown (Dash 4) ─────────────────────────────────────────────── */
+.dash-dropdown-wrapper .dash-dropdown {
   background-color: #0f172a !important;
-  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+  border: 1px solid #334155 !important;
   border-radius: 8px !important;
+}
+
+.dash-dropdown-wrapper .dash-dropdown:hover {
+  border-color: #6366f1 !important;
+}
+
+.dash-dropdown-wrapper .dash-dropdown:focus {
+  border-color: #6366f1 !important;
+  outline-color: #6366f1 !important;
+}
+
+.dash-dropdown-wrapper .dash-dropdown-value,
+.dash-dropdown-wrapper .dash-dropdown-value-item {
   color: #e2e8f0 !important;
 }
-.Select-control:hover { border-color: #6366f1 !important; }
-.Select.is-focused > .Select-control {
-  border-color: #6366f1 !important;
-  box-shadow: 0 0 0 1px #6366f1 !important;
+
+.dash-dropdown-wrapper .dash-dropdown-placeholder {
+  color: #64748b !important;
 }
-.Select-menu-outer {
+
+.dash-dropdown-wrapper .dash-dropdown-value-count {
+  color: #c7d2fe !important;
+  background-color: #312e81 !important;
+}
+
+.dash-dropdown-wrapper .dash-dropdown-trigger-icon,
+.dash-dropdown-wrapper .dash-dropdown-clear {
+  color: #94a3b8 !important;
+  fill: #94a3b8 !important;
+}
+
+.dash-dropdown-content {
   background-color: #1e293b !important;
   border: 1px solid #334155 !important;
   border-radius: 8px !important;
-  margin-top: 4px !important;
   z-index: 9999 !important;
+  color: #e2e8f0 !important;
 }
-.Select-option { background-color: #1e293b !important; color: #e2e8f0 !important; }
-.Select-option:hover,
-.Select-option.is-focused { background-color: #312e81 !important; color: #fff !important; }
-.Select-option.is-selected { background-color: #4f46e5 !important; }
-.Select-placeholder { color: #64748b !important; }
-.Select-value-label { color: #e2e8f0 !important; }
-.Select-multi-value-wrapper .Select-value {
-  background-color: #312e81 !important;
-  border-color: #6366f1 !important;
-  color: #c7d2fe !important;
-  border-radius: 6px !important;
+
+.dash-dropdown-content .dash-dropdown-option {
+  color: #e2e8f0 !important;
 }
-.Select-value-icon { color: #c7d2fe !important; border-right-color: #6366f1 !important; }
-.Select-value-icon:hover { background-color: #6366f1 !important; color: #fff !important; }
-.Select-input > input { color: #e2e8f0 !important; }
-.Select-arrow { border-top-color: #64748b !important; }
+
+.dash-dropdown-content .dash-dropdown-search-container {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+}
+
+.dash-dropdown-content .dash-dropdown-search {
+  color: #e2e8f0 !important;
+}
+
+.dash-dropdown-content .dash-dropdown-action-button {
+  color: #94a3b8 !important;
+}
+
+.dash-dropdown-content .dash-dropdown-action-button:hover {
+  color: #6366f1 !important;
+}
 
 /* ── Plotly ─────────────────────────────────────────────────────────── */
 .js-plotly-plot .plotly .modebar { display: none !important; }

@@ -336,7 +336,7 @@ def make_ownership_chart(df):
         return _empty("Tipo de Empresa", 420)
 
     fig = go.Figure(go.Pie(
-        labels=counts["ownership"],
+        labels=counts["label"],
         values=counts["count"],
         hole=0.58,
         marker=dict(colors=[PALETTE[0], PALETTE[1]], line=dict(color="#0f172a", width=2)),
