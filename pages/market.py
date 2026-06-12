@@ -30,7 +30,7 @@ def chart_card(graph_id):
 layout = html.Div([
     html.Div([
         html.H2("Empresas e Mercado", className="fw-bold mb-1"),
-        html.P("Quem está contratando, de onde e em qual escala", className="text-muted mb-0", style={"fontSize": "14px"}),
+        html.P("Perfil das empresas que contratam profissionais de Ciência de Dados", className="text-muted mb-0", style={"fontSize": "14px"}),
     ], className="mb-4"),
 
     # Filters
@@ -51,10 +51,10 @@ layout = html.Div([
         style=CARD_STYLE,
     ),
 
-    # Row 1: Top empresas + Top localizações
+    # Row 1: Tipo de empresa + Skills por senioridade
     dbc.Row([
-        dbc.Col(chart_card("mkt-chart-companies"), md=6),
-        dbc.Col(chart_card("mkt-chart-locations"), md=6),
+        dbc.Col(chart_card("mkt-chart-ownership"), md=5),
+        dbc.Col(chart_card("mkt-chart-skills-seniority"), md=7),
     ], className="mb-4 g-3"),
 
     # Row 2: Tamanho de empresa
@@ -67,8 +67,8 @@ layout = html.Div([
 
 @callback(
     [
-        dash.Output("mkt-chart-companies", "figure"),
-        dash.Output("mkt-chart-locations", "figure"),
+        dash.Output("mkt-chart-ownership", "figure"),
+        dash.Output("mkt-chart-skills-seniority", "figure"),
         dash.Output("mkt-chart-size", "figure"),
     ],
     [
@@ -79,7 +79,7 @@ layout = html.Div([
 def update_market(industry, seniority):
     dff, _ = prep.apply_filters(df, skills_df, seniority=seniority, industry=industry)
     return (
-        charts.make_top_companies_chart(dff),
-        charts.make_top_locations_chart(dff),
+        charts.make_ownership_chart(dff),
+        charts.make_avg_skills_by_seniority_chart(dff),
         charts.make_company_size_chart(dff),
     )

@@ -318,54 +318,47 @@ def make_salary_by_skill_chart(skills_df, n=12):
 
 # ── Market ───────────────────────────────────────────────────────────────────
 
-def make_top_companies_chart(df):
-    counts = prep.get_top_companies(df, n=12)
+def make_ownership_chart(df):
+    counts = prep.get_ownership_distribution(df)
     if counts.empty:
-        return _empty("Top Empresas Contratantes", 460)
+        return _empty("Tipo de Empresa", 420)
 
-    fig = go.Figure(go.Bar(
-        x=counts["count"],
-        y=counts["label"],
-        orientation="h",
-        marker=dict(color=PRIMARY, opacity=0.9),
-        text=counts["count"],
-        textposition="outside",
-        textfont=dict(color=FONT_COLOR),
-        hovertemplate="<b>%{y}</b>: %{x} vagas<extra></extra>",
+    fig = go.Figure(go.Pie(
+        labels=counts["ownership"],
+        values=counts["count"],
+        hole=0.58,
+        marker=dict(colors=[PALETTE[0], PALETTE[1]], line=dict(color="#0f172a", width=2)),
+        textinfo="label+percent",
+        textfont=dict(color=FONT_COLOR, size=13),
+        hovertemplate="<b>%{label}</b><br>%{value} vagas (%{percent})<extra></extra>",
     ))
     fig.update_layout(
-        **_base(460),
-        title=dict(text="Top Empresas Contratantes", font=dict(size=15, color=FONT_COLOR)),
-        xaxis=dict(showgrid=False, showticklabels=False, zeroline=False),
-        yaxis=dict(showgrid=False),
+        **_base(420),
+        title=dict(text="Tipo de Empresa (Capital Aberto vs Fechado)", font=dict(size=15, color=FONT_COLOR)),
+        showlegend=False,
     )
     return fig
 
 
-def make_top_locations_chart(df):
-    counts = prep.get_top_locations(df, n=12)
-    if counts.empty:
-        return _empty("Top Localizações", 460)
+def make_avg_skills_by_seniority_chart(df):
+    dff = prep.get_avg_skills_by_seniority(df)
+    if dff.empty:
+        return _empty("Skills Exigidas por Senioridade", 420)
 
     fig = go.Figure(go.Bar(
-        x=counts["count"],
-        y=counts["state"],
-        orientation="h",
-        marker=dict(
-            color=counts["count"],
-            colorscale=[[0, "#164e63"], [1, "#06b6d4"]],
-            showscale=False,
-        ),
-        text=counts["count"],
+        x=dff["label"],
+        y=dff["avg_skills"],
+        marker=dict(color=PALETTE[: len(dff)]),
+        text=dff["avg_skills"].map("{:.1f}".format),
         textposition="outside",
-        textfont=dict(color=FONT_COLOR),
-        hovertemplate="<b>%{y}</b>: %{x} empresas<extra></extra>",
+        textfont=dict(color=FONT_COLOR, size=13),
+        hovertemplate="<b>%{x}</b><br>Média: %{y:.1f} skills por vaga<extra></extra>",
     ))
     fig.update_layout(
-        **_base(460),
-        title=dict(text="Top Localizações de HQ", font=dict(size=15, color=FONT_COLOR)),
-        xaxis=dict(showgrid=False, showticklabels=False, zeroline=False),
-        yaxis=dict(showgrid=False),
+        **_base(420),
+        title=dict(text="Média de Skills Exigidas por Senioridade", font=dict(size=15, color=FONT_COLOR)),
+        yaxis=dict(showgrid=True, gridcolor=GRID_COLOR, zeroline=False, title="Média de skills"),
+        xaxis=dict(showgrid=False),
     )
     return fig
 

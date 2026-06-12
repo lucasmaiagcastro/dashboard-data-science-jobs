@@ -163,11 +163,26 @@ def get_salary_by_skill(skills_df, n=12):
 
 # ── Market ───────────────────────────────────────────────────────────────────
 
-def get_top_companies(df, n=12):
-    counts = df["company"].value_counts().head(n).reset_index()
-    counts.columns = ["company", "count"]
-    counts["label"] = counts["company"].str.replace(r"company_0*(\d+)", r"Empresa \1", regex=True)
-    return counts.sort_values("count")
+def get_ownership_distribution(df):
+    valid = df[df["ownership"] != "Não informado"]
+    counts = valid["ownership"].value_counts().reset_index()
+    counts.columns = ["ownership", "count"]
+    return counts
+
+
+def get_avg_skills_by_seniority(df):
+    order = ["junior", "midlevel", "senior", "lead"]
+    dff = (
+        df[df["seniority_level"].isin(order)]
+        .groupby("seniority_level")["skills_count"]
+        .mean()
+        .reindex(order)
+        .dropna()
+        .reset_index()
+    )
+    dff["label"] = dff["seniority_level"].map(SENIORITY_LABELS)
+    dff["avg_skills"] = dff["skills_count"].round(1)
+    return dff
 
 
 def get_top_locations(df, n=12):
