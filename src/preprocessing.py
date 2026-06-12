@@ -1,3 +1,8 @@
+"""Carrega e prepara os dados usados pelo dashboard.
+
+Centraliza leitura dos CSVs, filtros dos callbacks e agregações
+que alimentam os gráficos.
+"""
 import pandas as pd
 
 JOBS_PATH = "data/data_science_jobs_clean.csv"
@@ -43,6 +48,7 @@ def get_industry_options(df):
 
 
 def load_data():
+    """Lê os CSVs e descarta vagas sem salário ajustado."""
     df = pd.read_csv(JOBS_PATH)
     skills_df = pd.read_csv(SKILLS_PATH)
     df = df.dropna(subset=["salary_avg_adjusted"])
@@ -51,6 +57,11 @@ def load_data():
 
 
 def apply_filters(df, skills_df, seniority=None, status=None, industry=None):
+    """Aplica os filtros dos dropdowns nos dois dataframes de uma vez.
+
+    Precisa manter df e skills_df alinhados — se filtrar por senioridade
+    em um e esquecer o outro, os gráficos de skills ficam inconsistentes.
+    """
     dff = df.copy()
     dff_skills = skills_df.copy()
     if seniority:
@@ -125,6 +136,10 @@ def get_top_skills(skills_df, n=15):
 
 
 def get_skills_by_seniority(skills_df, n_skills=10):
+    """Pivot skill x senioridade para alimentar o heatmap.
+
+    Usa só as n_skills mais citadas e reordena colunas de junior → lead.
+    """
     order = ["junior", "midlevel", "senior", "lead"]
     top_skills = skills_df["skill"].value_counts().head(n_skills).index
     dff = skills_df[
@@ -137,6 +152,7 @@ def get_skills_by_seniority(skills_df, n_skills=10):
 
 
 def get_skills_by_industry(skills_df, n_skills=8):
+    """Pivot skill x indústria. Ignora registros sem setor informado."""
     valid = [i for i in skills_df["industry"].unique() if i != "Não informado"]
     top_skills = skills_df["skill"].value_counts().head(n_skills).index
     dff = skills_df[skills_df["skill"].isin(top_skills) & skills_df["industry"].isin(valid)]
@@ -148,6 +164,11 @@ def get_skills_by_industry(skills_df, n_skills=8):
 # ── Salaries ─────────────────────────────────────────────────────────────────
 
 def get_salary_by_industry(df):
+    """Retorna o subset filtrado e a ordem das indústrias por mediana salarial.
+
+    A ordem decrescente é usada no boxplot pra indústrias mais bem pagas
+    aparecerem primeiro.
+    """
     valid = df[~df["industry"].isin(["Não informado"])]
     order = (
         valid.groupby("industry")["salary_avg_adjusted"]
@@ -212,7 +233,10 @@ def get_avg_skills_by_seniority(df):
 
 
 def get_top_locations(df, n=12):
+    """Extrai estado/região a partir da coluna headquarter e conta vagas."""
+
     def extract_state(hq):
+        """headquarter vem como 'Cidade, ST, US' — pegamos o estado."""
         parts = str(hq).split(", ")
         return parts[1] if len(parts) >= 3 else parts[0]
 
@@ -224,6 +248,11 @@ def get_top_locations(df, n=12):
 
 
 def get_jobs_by_company_size(df):
+    """Agrupa vagas por faixa de tamanho (pequena → muito grande).
+
+    company_size chega como texto tipo '10,000 employees', então
+    precisamos parsear o número antes de categorizar.
+    """
     SIZE_ORDER = ["Pequena (<1k)", "Média (1k–10k)", "Grande (10k–100k)", "Muito Grande (>100k)"]
 
     def categorize(val):

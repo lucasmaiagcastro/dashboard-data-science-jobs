@@ -1,3 +1,4 @@
+"""Página de skills — ranking e heatmaps por senioridade/indústria."""
 import dash
 from dash import dcc, html, callback
 import dash_bootstrap_components as dbc
@@ -77,6 +78,7 @@ layout = html.Div([
     ],
 )
 def update_skills(seniority, industry):
+    """Callback de skills: usa o dataset explodido (1 linha por skill)."""
     dff, dff_skills = prep.apply_filters(df, skills_df, seniority=seniority, industry=industry)
     return (
         charts.make_top_skills_chart(dff_skills),

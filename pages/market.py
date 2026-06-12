@@ -1,3 +1,4 @@
+"""Página de mercado — perfil das empresas contratantes."""
 import dash
 from dash import dcc, html, callback
 import dash_bootstrap_components as dbc
@@ -77,6 +78,7 @@ layout = html.Div([
     ],
 )
 def update_market(industry, seniority):
+    """Callback de mercado: capital, tamanho e skills médias por senioridade."""
     dff, _ = prep.apply_filters(df, skills_df, seniority=seniority, industry=industry)
     return (
         charts.make_ownership_chart(dff),

@@ -1,3 +1,7 @@
+"""Entry point do dashboard Dash (multi-page).
+
+Configura navbar, layout global e expõe `server` pro deploy na Plotly Cloud.
+"""
 import dash
 import dash_bootstrap_components as dbc
 from dash import html

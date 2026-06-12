@@ -1,3 +1,4 @@
+"""Página salarial — histograma, boxplots e mediana por skill."""
 import dash
 from dash import dcc, html, callback
 import dash_bootstrap_components as dbc
@@ -94,6 +95,7 @@ layout = html.Div([
     ],
 )
 def update_salaries(seniority, status, industry):
+    """Callback salarial: gráficos de vaga usam df, salário por skill usa skills_df."""
     dff, dff_skills = prep.apply_filters(df, skills_df, seniority, status, industry)
     return (
         charts.make_salary_histogram(dff),

@@ -1,3 +1,8 @@
+"""Figuras Plotly do dashboard.
+
+Cada make_* recebe um dataframe (já filtrado) e devolve um go.Figure
+com layout padronizado. Se não houver dados, retorna gráfico vazio via _empty.
+"""
 import plotly.graph_objects as go
 import src.preprocessing as prep
 
@@ -32,6 +37,7 @@ def _xaxis_labels(**kwargs):
 
 
 def _empty(title, height=400):
+    """Placeholder quando o filtro atual não retorna nenhum registro."""
     fig = go.Figure()
     fig.update_layout(
         **_base(height),
@@ -151,6 +157,11 @@ def make_top_skills_chart(skills_df, n=15):
 
 
 def make_skills_heatmap_by_seniority(skills_df):
+    """Heatmap de skills por senioridade, em % das menções da coluna.
+
+    Normaliza por coluna em vez de usar contagem bruta — senão senior
+    domina só porque tem mais vagas na base.
+    """
     pivot = prep.get_skills_by_seniority(skills_df)
     if pivot.empty:
         return _empty("Skills por Senioridade", 460)
@@ -176,6 +187,7 @@ def make_skills_heatmap_by_seniority(skills_df):
 
 
 def make_skills_heatmap_by_industry(skills_df):
+    """Mesma lógica do heatmap de senioridade, mas por indústria."""
     pivot = prep.get_skills_by_industry(skills_df)
     if pivot.empty:
         return _empty("Skills por Indústria", 440)
@@ -224,6 +236,7 @@ def make_salary_histogram(df):
 
 
 def make_salary_boxplot_by_seniority(df):
+    """Boxplot salarial — um trace por nível de senioridade."""
     order = ["junior", "midlevel", "senior", "lead"]
     fig = go.Figure()
     for i, sen in enumerate(order):
@@ -252,6 +265,7 @@ def make_salary_boxplot_by_seniority(df):
 
 
 def make_salary_by_industry_chart(df):
+    """Boxplot por indústria, ordenado da mediana mais alta pra mais baixa."""
     dff, order = prep.get_salary_by_industry(df)
     if not order:
         return _empty("Distribuição Salarial por Indústria", 420)

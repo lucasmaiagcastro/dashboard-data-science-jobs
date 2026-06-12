@@ -1,3 +1,4 @@
+"""Página inicial — KPIs e distribuições gerais do mercado."""
 import dash
 from dash import dcc, html, Input, Output, callback
 import dash_bootstrap_components as dbc
@@ -120,6 +121,7 @@ layout = html.Div([
     ],
 )
 def update_overview(seniority, status, industry):
+    """Callback da visão geral: refiltra os dados e atualiza KPIs + gráficos."""
     dff, dff_skills = prep.apply_filters(df, skills_df, seniority, status, industry)
     kpis = prep.get_overview_kpis(dff, dff_skills)
 
