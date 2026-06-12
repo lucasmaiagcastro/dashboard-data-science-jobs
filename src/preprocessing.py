@@ -8,14 +8,14 @@ SENIORITY_LABELS = {
     "midlevel": "Mid-level",
     "senior": "Senior",
     "lead": "Lead",
-    "Não informado": "N/A",
+    "Não informado": "Não Informado",
 }
 
 STATUS_LABELS = {
     "on-site": "Presencial",
     "hybrid": "Híbrido",
     "remote": "Remoto",
-    "Não informado": "N/A",
+    "Não informado": "Não Informado",
 }
 
 
@@ -67,7 +67,7 @@ def get_overview_kpis(df, skills_df):
 # ── Overview ─────────────────────────────────────────────────────────────────
 
 def get_jobs_by_seniority(df):
-    order = ["junior", "midlevel", "senior", "lead", "Não informado"]
+    order = ["junior", "midlevel", "senior", "lead"]
     counts = (
         df["seniority_level"].value_counts()
         .reindex(order)

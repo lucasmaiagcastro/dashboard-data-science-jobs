@@ -77,7 +77,7 @@ layout = html.Div([
                 ], md=4),
             ], className="g-3")
         ),
-        className="border-0 mb-4",
+        className="border-0 mb-4 filter-card",
         style=CARD_STYLE,
     ),
 
